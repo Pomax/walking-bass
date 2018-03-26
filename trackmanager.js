@@ -1,8 +1,8 @@
 const easymidi  = require('easymidi'),
       PIANO = 'piano',
-	    DRUMS = 'drums',
-	    BASS = 'bass',
-	    INSTRUMENTS = [PIANO, DRUMS, BASS],
+      DRUMS = 'drums',
+      BASS = 'bass',
+      INSTRUMENTS = [PIANO, DRUMS, BASS],
       OUTPUT_NAME = 'Nodejs MIDI out';
 
 const PianoGenerator = require('./generators/piano'),
@@ -19,7 +19,7 @@ const nextChannel = (() => {
  */
 class Track {
   constructor(manager, type, BPM) {
-  	this.manager = manager;
+    this.manager = manager;
     this.type = type;
     this.channel = nextChannel(); // OFF BY ONE, since DAW count 1..., not 0...
     console.log(this.type, (this.channel+1));
@@ -27,11 +27,11 @@ class Track {
   }
 
   setupGenerator(type, BPM) {
-  	switch(type) {
-  		case PIANO: return new PianoGenerator(this, BPM);
-  		case BASS: return new BassGenerator(this, BPM);
+    switch(type) {
+      case PIANO: return new PianoGenerator(this, BPM);
+      case BASS: return new BassGenerator(this, BPM);
       case DRUMS: return new DrumGenerator(this, BPM);
-  	}
+    }
   }
 
   playNote(note, velocity=100, channel=this.channel) {

@@ -1,7 +1,7 @@
 const theory = require('./music-theory.js');
 
 class Generator {
-	constructor(track, BMP) {
+  constructor(track, BMP) {
     let tick = 60000/BMP;
 
     // straight intervals
@@ -28,7 +28,7 @@ class Generator {
       duration: 0,
       stop: ()=>{}
     };
-	}
+  }
 
   playStep(step) {
     let notes = step.notes || [],
@@ -74,7 +74,7 @@ class Generator {
     if (step) { this.playStep(step); }
   }
 
-	tick() {
+  tick() {
     var now = Date.now();
     var ms = now - this.last;
     if (ms >= this.step.duration) {
@@ -90,11 +90,11 @@ class Generator {
     this.tick();
   }
 
-	pause() {
+  pause() {
     this.stop();
   }
 
-	stop() {
+  stop() {
     this.stop = true;
   }
 };

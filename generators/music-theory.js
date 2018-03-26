@@ -131,7 +131,7 @@ module.exports = {
   octaves,
   nameToNumber,
 
-	modes,
+  modes,
   mode: (note, mode) => modes[mode].map(offset(nameToNumber(note))),
 
   tonics,
