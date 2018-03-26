@@ -67,6 +67,21 @@ class PianoGenerator extends Generator {
 
   playStep(step) {
     super.playStep(step);
+    if (step.chord) {
+      this.track.updateRoot(step.root);
+      this.track.updateChord(step.chord, step.notes);
+    }
+  }
+
+  getNextChord() {
+    let next = this.stepCounter + 1;
+    if (next >= this.program.length) { next = 0; }
+    let step = this.program[next];
+    let notes = step.notes;
+    if (step.additional) {
+      notes = notes.concat(step.additional);
+    }
+    return notes;
   }
 
 };

@@ -36,11 +36,6 @@ class Generator {
         arpeggiated = step.arpeggiated || false,
         arp = step.arp || 0;
 
-    if (step.root) {
-      this.currenRoot = step.root;
-      this.track.updateRoot(step.root);
-    }
-
     if(typeof step.note === 'function') {
       notes = step.note();
     }
@@ -52,6 +47,9 @@ class Generator {
     if (step.additional) {
       notes = notes.concat(step.additional);
     }
+
+    // update the step for subclass code
+    step.notes = notes;
 
     if (!arpeggiated) {
       let stops = notes.map(note => this.track.playNote(note));

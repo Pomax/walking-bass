@@ -46,6 +46,10 @@ class Track {
     this.manager.updateRoot(root);
   }
 
+  updateChord(chord, notes) {
+    this.manager.updateChord(chord, notes);
+  }
+
   play() { this.generator.play(); }
 
   pause() { this.generator.pause(); }
@@ -80,6 +84,16 @@ class TrackManager {
 
   updateRoot(root) {
     this.currentRoot = root;
+  }
+
+  updateChord(chord, notes) {
+    this.currentChord = chord;
+    this.currentChordNotes = notes;
+  }
+
+  getNextChord() {
+    let piano = this.tracks[0].generator;
+    return piano.getNextChord ? piano.getNextChord(): [];
   }
 
   play() {
