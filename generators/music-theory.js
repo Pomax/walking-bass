@@ -42,6 +42,7 @@ const octaves = {
 
 function nameToNumber(name) {
   if (name == name<<0) return name;
+  if (typeof name === 'function') return name;
   let note, octave;
   name.replace(/(\D+)(\d+)/, function(_, n, o) {
     note = n;
@@ -80,7 +81,7 @@ const chords = {
        m7: [0,3,7,10],
     mmaj7: [0,3,7,11],
      dom7: [0,4,7,10],
-     maj7: [0,4,7,11],
+      '7': [0,4,7,11],
      aug7: [0,4,8,10],
   augmaj7: [0,4,8,11],
 

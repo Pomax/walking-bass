@@ -102,10 +102,14 @@ class Generator {
 };
 
 Generator.makeStep = function(options) {
-  let note = options.note;
+  let note = options.note = theory.nameToNumber(options.note);
   if (options.chord) {
-    let root = options.root = theory.nameToNumber(options.note);
+    let root = options.root = options.note;
+    console.log(options.chord);
     options.notes = theory.chord(root, options.chord, options.inversion);
+  }
+  if (options.additional) {
+    options.additional = options.additional.map(theory.nameToNumber);
   }
   return options;
 }
