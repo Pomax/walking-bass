@@ -10,16 +10,28 @@ class BassGenerator extends Generator {
     let q = this.intervals[16];
 
     this.program = [
-      step(() => this.generateBassNote(), false, 2*q),
+      step({
+        note: () => this.generateBassNote(),
+        duration: 2*q,
+      }),
       rest(2*q),
 
-      step(() => this.generateBassNote(), false, 2*q),
+      step({
+        note: () => this.generateBassNote(),
+        duration: 2*q,
+      }),
       rest(2*q),
 
-      step(() => this.generateBassNote(), false, 2*q),
+      step({
+        note: () => this.generateBassNote(),
+        duration: 2*q,
+      }),
       rest(2*q),
 
-      step(() => this.generateBassNote(), false, 2*q),
+      step({
+        note: () => this.generateBassNote(),
+        duration: 2*q,
+      }),
       rest(2*q),
     ];
   }

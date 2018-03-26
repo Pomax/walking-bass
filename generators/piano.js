@@ -11,26 +11,56 @@ class PianoGenerator extends Generator {
     let q = this.intervals[8];
 
     this.program = [
-      step(theory.chord(note('D3'), 'm9'), note('D3'), 3*q),
-      step(theory.chord(note('D3'), 'm9'), note('D3'), 1*q),
+      step({
+        note: 'D3',
+        chord: 'm9',
+        duration: q*3
+      }),
+      step({
+        note: 'D3',
+        chord: 'm9',
+        duration: q
+      }),
       rest(4*q),
 
-      step(theory.chord(note('G2'), '9', 2), note('G3'), 3*q),
-      step(theory.chord(note('G2'), '9', 2), note('G3'), 1*q),
+      step({
+        note: 'G2',
+        chord: '9',
+        inversion: 2,
+        duration: q*3
+      }),
+      step({
+        note: 'G2',
+        chord: '9',
+        inversion: 2,
+        duration: q
+      }),
       rest(4*q),
 
-      step(theory.chord(note('C3'), '6/9'), note('C3'), 3*q),
-      step(theory.chord(note('C3'), '6/9'), note('C3'), 1*q),
+      step({
+        note: 'C3',
+        chord: '6/9',
+        duration: q*3
+      }),
+      step({
+        note: 'C3',
+        chord: '6/9',
+        duration: q
+      }),
       rest(4*q),
 
-      step([].concat(
-        theory.chord(note('C3'), 'maj'),
-        theory.chord(note('C4'), 'maj')
-      ), note('C3'), 3*q),
-      step([].concat(
-        theory.chord(note('C3'), 'maj'),
-        theory.chord(note('C4'), 'maj')
-      ), note('C3'), 1*q),
+      step({
+        note: 'C3',
+        additional: theory.chord(note('C4'), 'maj'),
+        chord: 'maj',
+        duration: q*3
+      }),
+      step({
+        note: 'C3',
+        additional: theory.chord(note('C4'), 'maj'),
+        chord: 'maj',
+        duration: q
+      }),
       rest(4*q),
     ];
   }

@@ -41,12 +41,16 @@ class Generator {
       this.track.updateRoot(step.root);
     }
 
-    if(typeof notes === 'function') {
-      notes = notes();
+    if(typeof step.note === 'function') {
+      notes = step.note();
     }
 
     if (!notes.forEach) {
       notes = [notes];
+    }
+
+    if (step.additional) {
+      notes = notes.concat(step.additional);
     }
 
     if (!arpeggiated) {
@@ -99,9 +103,14 @@ class Generator {
   }
 };
 
-Generator.makeStep = function(notes=[], root=false, duration=0, arpeggiated=false, arp=0) {
-  return { notes, root, duration, arpeggiated, arp };
-};
+Generator.makeStep = function(options) {
+  let note = options.note;
+  if (options.chord) {
+    let root = options.root = theory.nameToNumber(options.note);
+    options.notes = theory.chord(root, options.chord, options.inversion);
+  }
+  return options;
+}
 
 Generator.makeRest = function(duration=0) {
   return { rest: true, duration };
