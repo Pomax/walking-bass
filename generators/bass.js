@@ -11,16 +11,16 @@ class BassGenerator extends Generator {
 
     this.program = [
       step(() => this.generateBassNote(), false, 2*q),
-      rest(2*q)
+      rest(2*q),
 
       step(() => this.generateBassNote(), false, 2*q),
-      rest(2*q)
+      rest(2*q),
 
       step(() => this.generateBassNote(), false, 2*q),
-      rest(2*q)
+      rest(2*q),
 
       step(() => this.generateBassNote(), false, 2*q),
-      rest(2*q)
+      rest(2*q),
     ];
   }
 
