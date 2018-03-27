@@ -2,17 +2,14 @@ const easymidi  = require('easymidi'),
       PIANO = 'piano',
       DRUMS = 'drums',
       BASS = 'bass',
-      INSTRUMENTS = [PIANO, DRUMS, BASS],
-      OUTPUT_NAME = 'Nodejs MIDI out';
+      INSTRUMENTS = [DRUMS, PIANO, BASS], // drums need to be 1 because of Strike...
+      OUTPUT_NAME = 'Nodejs MIDI output';
 
 const PianoGenerator = require('./generators/piano'),
       DrumGenerator = require('./generators/drums'),
       BassGenerator = require('./generators/bass');
 
-const nextChannel = (() => {
-        let channel = 0;
-        return () => channel++;
-      })();
+const midiChannel = v => v-1;
 
 /**
  *
@@ -21,21 +18,36 @@ class Track {
   constructor(manager, type, BPM) {
     this.manager = manager;
     this.type = type;
-    this.channel = nextChannel(); // OFF BY ONE, since DAW count 1..., not 0...
-    console.log(this.type, (this.channel+1));
+    this.channel = midiChannel(1); // for now
+    this.bindOutput();
     this.generator = this.setupGenerator(type, BPM);
+  }
+
+  bindOutput() {
+    let outputName = `${OUTPUT_NAME} ${this.type}`.toLowerCase();
+    if (process.platform === "win32") {
+      var outputs = easymidi.getOutputs();
+      outputs.some(name => {
+        let deviceName = name.toLowerCase();
+        if (deviceName.indexOf(outputName) > -1) {
+          return (this.output = new easymidi.Output(name));
+        }
+      });
+    } else {
+      this.output = new easymidi.Output(outputName, true);
+    }
   }
 
   setupGenerator(type, BPM) {
     switch(type) {
       case PIANO: return new PianoGenerator(this, BPM);
-      case BASS: return new BassGenerator(this, BPM);
       case DRUMS: return new DrumGenerator(this, BPM);
+      case BASS: return new BassGenerator(this, BPM);
     }
   }
 
   playNote(note, velocity=100, channel=this.channel) {
-    let out = this.manager.output;
+    let out = this.output;
     let data = { note, velocity, channel };
 
     out.send('noteon', data);
@@ -50,11 +62,7 @@ class Track {
     this.manager.updateChord(chord, notes);
   }
 
-  play() { this.generator.play(); }
-
-  pause() { this.generator.pause(); }
-
-  stop() { this.generator.stop(); }
+  tick(tickCount) { this.generator.tick(tickCount); }
 };
 
 
@@ -63,23 +71,8 @@ class Track {
  */
 class TrackManager {
   constructor(BPM) {
-    this.bindOutput();
     this.tracks = INSTRUMENTS.map(name => new Track(this, name, BPM));
-  }
-
-  bindOutput() {
-    if (process.platform === "win32") {
-      var outputName = OUTPUT_NAME.toLowerCase();
-      var outputs = easymidi.getOutputs();
-      outputs.some(name => {
-        let deviceName = name.toLowerCase();
-        if (deviceName.indexOf(outputName) > -1) {
-          return (this.output = new easymidi.Output(name));
-        }
-      });
-    } else {
-      this.output = new easymidi.Output(track.name, true);
-    }
+    this.v128 = 60000/(BPM*32);
   }
 
   updateRoot(root) {
@@ -92,20 +85,31 @@ class TrackManager {
   }
 
   getNextChord() {
-    let piano = this.tracks[0].generator;
+    let piano = this.tracks[1].generator;
     return piano.getNextChord ? piano.getNextChord(): [];
   }
 
+  tick() {
+    if (!this.playing) return;
+    let diff = Date.now() - this.start;
+    let tickCount = this.tickCount = (diff/this.v128)|0;
+    this.tracks.forEach(t => t.tick(this.tickCount));
+    setTimeout(() => this.tick(), 2);
+  }
+
   play() {
-    this.tracks.forEach(t => t.play());
+    this.tickCount = 0;
+    this.playing = true;
+    this.start = Date.now();
+    this.tick();
   }
 
   pause() {
-    this.tracks.forEach(t => t.pause());
+    this.playing = false;
   }
 
   stop() {
-    this.tracks.forEach(t => t.stop());
+    this.pause();
   }
 };
 

@@ -1,4 +1,7 @@
-const Generator = require('./generator');
+const Generator = require('./generator'),
+      theory = require('./music-theory.js'),
+      step = Generator.makeStep,
+      rest = Generator.makeRest;
 
 /**
  * For the drum section, we very specifically
@@ -10,7 +13,24 @@ const Generator = require('./generator');
  * the rhythm up/down very easy.
  */
 class DrumGenerator extends Generator {
-  play() {}
+  constructor(track, BPM) {
+    super(track, BPM);
+    this.program = this.getProgram();
+  }
+
+  getProgram() {
+    let q = 4 * this.intervals[1];
+    return [
+      step({
+        note: 'C2',
+        duration: 0,
+      }),
+      step({
+        note: 'D2',
+        duration: q,
+      }),
+    ];
+  }
 };
 
 module.exports = DrumGenerator;

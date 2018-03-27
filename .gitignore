@@ -1,2 +1,8 @@
-piano
+# Obviously.
 node_modules
+
+# I have no need for this file.
+package-lock.json
+
+# Reaper backup files.
+*.rpp-bak

@@ -7,12 +7,20 @@ var path = require('path'),
     TrackManager = require('./trackmanager'),
     player = new TrackManager(120);
 
+app.get('/play', function(req, res){
+  player.play();
+  res.json({ stopped: true });
+});
+
+app.get('/stop', function(req, res){
+  player.stop();
+  res.json({ stopped: true });
+});
+
 server.listen(process.env.PORT || 8080, function(){
   console.log('listening on *:8080');
   player.play();
 });
-
-
 
 
 /*
