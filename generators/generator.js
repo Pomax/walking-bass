@@ -35,8 +35,8 @@ class Generator {
   playStep(step) {
     let notes = step.notes || [],
         duration = step.duration || 0,
-        arpeggiated = step.arpeggiated || false,
-        arp = step.arp || 0;
+        arp = step.arp || 0,
+        stops;
 
     if(typeof step.note === 'function') {
       notes = step.note(step);
@@ -53,17 +53,20 @@ class Generator {
     // update the step for subclass code
     step.notes = notes;
 
-    if (!arpeggiated) {
-      let stops = notes.map(note => this.track.playNote(note));
-      step.stop = () => stops.forEach(s => s());
-      return;
+    if (!arp) {
+      stops = notes.map(note => this.track.playNote(note));
     }
 
-    let offset = 0;
-    notes.forEach(note => {
-      setTimeout(() => this.track.playNote(note), offset);
-      offset += arp;
-    });
+    else {
+      let delay = 0;
+      stops = notes.map(note => {
+        let stop = this.track.playNote(note, delay);
+        delay += arp;
+        return stop;
+      });
+    }
+
+    step.stop = () => stops.forEach(s => s());
   }
 
   stopPreviousStep(tickCount) {

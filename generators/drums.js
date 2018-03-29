@@ -26,7 +26,19 @@ class DrumGenerator extends Generator {
         duration: 0,
       }),
       step({
-        note: 'D2',
+        note: 'A2',
+        duration: 3*q,
+      }),
+      step({
+        note: 'A#3',
+        duration: q,
+      }),
+      step({
+        note: 'A3',
+        duration: 3*q,
+      }),
+      step({
+        note: 'A#3',
         duration: q,
       }),
     ];

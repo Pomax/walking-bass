@@ -18,15 +18,15 @@ class PianoGenerator extends Generator {
     }
   }
 
-  getNextChord() {
+  getCurrentChordStep() {
+    return this.step;
+  }
+
+  getNextChordStep() {
     let next = this.stepCounter + 1;
     if (next >= this.program.length) { next = 0; }
     let step = this.program[next];
-    let notes = step.notes;
-    if (step.additional) {
-      notes = notes.concat(step.additional);
-    }
-    return notes;
+    return step;
   }
 
   getProgram() {
@@ -35,19 +35,19 @@ class PianoGenerator extends Generator {
     let q = this.intervals[1];
 
     return [
-      step({ note: 'Bb3', chord:    '7', duration: q }),
-      step({ note: 'Bb3', chord: 'dim7', duration: q }),
-      step({ note:  'F3', chord:    '7', duration: q/2, additional: ['C3'] }),
-      step({ note: 'Bb3', chord:   'm7', duration: q/2 }),
-      step({ note:  'A3', chord:   'm7', duration: q/2 }),
-      step({ note: 'Ab3', chord:   'm7', duration: q/2 }),
+      step({ note: 'Bb3', chord:    '7', arp: 2, duration: q }),
+      step({ note: 'Bb3', chord: 'dim7', arp: 2, duration: q }),
+      step({ note:  'F3', chord:    '7', arp: 2, duration: q/2, additional: ['C3'] }),
+      step({ note: 'Bb3', chord:   'm7', arp: 2, duration: q/2 }),
+      step({ note:  'A3', chord:   'm7', arp: 2, duration: q/2 }),
+      step({ note: 'Ab3', chord:   'm7', arp: 2, duration: q/2 }),
 
-      step({ note:  'G3', chord:   'm7', duration: q }),
-      step({ note:  'C3', chord: 'dom7', duration: q }),
-      step({ note:  'F3', chord:    '7', duration: q/2 }),
-      step({ note:  'F3', chord:   'm7', duration: q/2 }),
-      step({ note: 'Ab3', chord: 'dim7', duration: q/2 }),
-      step({ note:  'E3', chord:    '9', duration: q/2}),
+      step({ note:  'G3', chord:   'm7', arp: 2, duration: q }),
+      step({ note:  'C3', chord: 'dom7', arp: 2, duration: q }),
+      step({ note:  'F3', chord:    '7', arp: 2, duration: q/2 }),
+      step({ note:  'F3', chord:   'm7', arp: 2, duration: q/2 }),
+      step({ note: 'Ab3', chord: 'dim7', arp: 2, duration: q/2 }),
+      step({ note:  'E3', chord:    '9', arp: 2, duration: q/2}),
     ]
   }
 

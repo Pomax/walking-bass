@@ -1,78 +1,16 @@
-const easymidi  = require('easymidi'),
-      PIANO = 'piano',
-      DRUMS = 'drums',
-      BASS = 'bass',
-      INSTRUMENTS = [DRUMS, PIANO, BASS], // drums need to be 1 because of Strike...
-      OUTPUT_NAME = 'Nodejs MIDI output';
-
-const PianoGenerator = require('./generators/piano'),
-      DrumGenerator = require('./generators/drums'),
-      BassGenerator = require('./generators/bass');
-
-const midiChannel = v => v-1;
-
-/**
- *
- */
-class Track {
-  constructor(manager, type, BPM) {
-    this.manager = manager;
-    this.type = type;
-    this.channel = midiChannel(1); // for now
-    this.bindOutput();
-    this.generator = this.setupGenerator(type, BPM);
-  }
-
-  bindOutput() {
-    let outputName = `${OUTPUT_NAME} ${this.type}`.toLowerCase();
-    if (process.platform === "win32") {
-      var outputs = easymidi.getOutputs();
-      outputs.some(name => {
-        let deviceName = name.toLowerCase();
-        if (deviceName.indexOf(outputName) > -1) {
-          return (this.output = new easymidi.Output(name));
-        }
-      });
-    } else {
-      this.output = new easymidi.Output(outputName, true);
-    }
-  }
-
-  setupGenerator(type, BPM) {
-    switch(type) {
-      case PIANO: return new PianoGenerator(this, BPM);
-      case DRUMS: return new DrumGenerator(this, BPM);
-      case BASS: return new BassGenerator(this, BPM);
-    }
-  }
-
-  playNote(note, velocity=100, channel=this.channel) {
-    let out = this.output;
-    let data = { note, velocity, channel };
-
-    out.send('noteon', data);
-    return () => out.send('noteoff', data);;
-  }
-
-  updateRoot(root) {
-    this.manager.updateRoot(root);
-  }
-
-  updateChord(chord, notes) {
-    this.manager.updateChord(chord, notes);
-  }
-
-  tick(tickCount) { this.generator.tick(tickCount); }
-};
-
+const Track = require('./track');
 
 /**
  *
  */
 class TrackManager {
   constructor(BPM) {
-    this.tracks = INSTRUMENTS.map(name => new Track(this, name, BPM));
-    this.v128 = 60000/(BPM*32);
+    // Note that this binding here + tick computation locks all
+    // tracks into the same BPM, so we don't get polyrhythm for
+    // free in the current implementation. We'd have to give each
+    // track its own wall-clock based tick computer for that.
+    this.BPM = BPM;
+    this.tracks = Track.getInstruments().map(name => new Track(this, name, BPM));
   }
 
   updateRoot(root) {
@@ -84,15 +22,20 @@ class TrackManager {
     this.currentChordNotes = notes;
   }
 
-  getNextChord() {
+  getCurrentChordStep() {
     let piano = this.tracks[1].generator;
-    return piano.getNextChord ? piano.getNextChord(): [];
+    return piano.getCurrentChordStep ? piano.getCurrentChordStep(): [];
+  }
+
+  getNextChordStep() {
+    let piano = this.tracks[1].generator;
+    return piano.getNextChordStep ? piano.getNextChordStep(): [];
   }
 
   tick() {
     if (!this.playing) return;
     let diff = Date.now() - this.start;
-    let tickCount = this.tickCount = (diff/this.v128)|0;
+    let tickCount = this.tickCount = ((diff*this.BPM*32)/60000)|0;
     this.tracks.forEach(t => t.tick(this.tickCount));
     setTimeout(() => this.tick(), 2);
   }

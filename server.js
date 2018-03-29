@@ -5,22 +5,21 @@ var path = require('path'),
     http = require('http'),
     server = http.Server(app),
     TrackManager = require('./trackmanager'),
-    player = new TrackManager(120);
+    BPM = 120,
+    player = undefined;
 
-app.get('/play', function(req, res){
-  player.play();
-  res.json({ stopped: true });
-});
-
-app.get('/stop', function(req, res){
-  player.stop();
-  res.json({ stopped: true });
-});
+var bpmPos = process.argv.indexOf('--bpm');
+if (bpmPos > -1) {
+  BPM = process.argv[bpmPos + 1];
+}
 
 server.listen(process.env.PORT || 8080, function(){
   console.log('listening on *:8080');
+  player = new TrackManager(BPM);
   player.play();
 });
+
+
 
 
 /*
