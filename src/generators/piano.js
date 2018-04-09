@@ -1,15 +1,8 @@
 const Generator = require('./generator'),
-      theory = require('./music-theory.js'),
       step = Generator.makeStep,
-      rest = Generator.makeRest,
-      note = theory.nameToNumber;
+      rest = Generator.makeRest;
 
 class PianoGenerator extends Generator {
-  constructor(track, BMP) {
-    super(track, BMP);
-    this.program = this.getProgram();
-  }
-
   playStep(step) {
     super.playStep(step);
     if (step.chord) {
@@ -30,6 +23,8 @@ class PianoGenerator extends Generator {
   }
 
   getProgram() {
+    let note = this.theory.nameToNumber;
+
     // Bb7 | Bdim7 | F7/C Bbm7 | Am7     D7  |
     // Gm7 |   C7  | F7   Fm7  | Abdim7 F7/A |
     let q = this.intervals[1];

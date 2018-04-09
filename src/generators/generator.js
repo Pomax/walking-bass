@@ -1,35 +1,50 @@
-const theory = require('./music-theory.js');
+const theory = require('./utils/music-theory.js');
 
 // basic timing intervals in terms of how many 'ticks' they run for.
-const intervals = {
-         '1': 128,
-         '2': 64,
-         '4': 32,
-         '8': 16,
-        '16': 8,
-        '32': 4,
-        '64': 2,
-      };
+const intervals = { '1': 128, '2': 64, '4': 32, '8': 16, '16': 8, '32': 4, '64': 2 };
 
 // enrich with dotted intervals:
-for(let i=0; i<7; i++) {
-  let v = 1 << i;
-  intervals[v + '.'] = 1.5 * intervals[v];
-}
+for(let i=0; i<7; i++) { let v = 1 << i; intervals[v + '.'] = 1.5 * intervals[v]; }
 
-
+/**
+ * ...
+ */
 class Generator {
   constructor(track, BMP) {
     this.track = track;
+    this.reset();
+  }
+
+  reset() {
     this.stepCounter = 0;
-    this.step = {
+    this.intervals = intervals;
+    this.theory = theory;
+    this.step = this.getDummyStep()
+    this.program = this.getProgram();
+  }
+
+  getDummyStep() {
+    return {
       note: 'C2',
       duration: 0,
       end: 0,
       stop: ()=>{}
     };
-    this.program = [this.step];
-    this.intervals = intervals;
+  }
+
+  getProgram() {
+    return [this.step];
+  }
+
+  notify(data) {
+    this.track.notify(data);
+  }
+
+  cleanup() {
+    if (this.currentStep) {
+      this.currentStep.stop();
+    }
+    this.reset();
   }
 
   playStep(step) {
@@ -39,7 +54,7 @@ class Generator {
         stops;
 
     if(typeof step.note === 'function') {
-      notes = step.note(step);
+      notes = step.note(step) || [];
     }
 
     if (!notes.forEach) {
@@ -67,6 +82,8 @@ class Generator {
     }
 
     step.stop = () => stops.forEach(s => s());
+
+    this.notify(step);
   }
 
   stopPreviousStep(tickCount) {
@@ -90,16 +107,17 @@ class Generator {
     // next step by that many ticks.
     //
     // Note that without syncing to a DAW, there will
-    // still be small amounts of drift that become 
+    // still be small amounts of drift that become
     // noticable after about a minute of play, so any
     // infinite-loop-based instrument should probably
-    // be "reset" for now. See the drum pattern for 
+    // be "reset" for now. See the drum pattern for
     // an example of this, where C2 is the 'stop'
     // instruction to Strike 2.
     let correction = this.stopPreviousStep(tickCount);
     let step = this.setNextStep();
     if (step) {
       step.end = tickCount + step.duration - correction;
+      this.currentStep = step;
       this.playStep(step);
     }
   }
@@ -111,24 +129,41 @@ class Generator {
   }
 };
 
+
+/**
+ * ...
+ */
 Generator.makeStep = function(options) {
+  options.originalNote = options.note;
+
   let note = options.note = theory.nameToNumber(options.note);
+
   if (note && !options.notes) {
     options.notes = [note];
   }
+
   if (options.chord) {
     let root = options.root = options.note;
     options.notes = theory.chord(root, options.chord, options.inversion);
   }
+
   if (options.additional) {
     options.additional = options.additional.map(theory.nameToNumber);
   }
+
   return options;
 }
 
+
+/**
+ * ...
+ */
 Generator.makeRest = function(duration=0) {
-  return { rest: true, duration };
+  return { note: false, duration };
 };
 
 
+/**
+ * ...
+ */
 module.exports = Generator;

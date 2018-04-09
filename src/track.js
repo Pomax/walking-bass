@@ -46,10 +46,17 @@ class Track {
     }
   }
 
+  cleanup() {
+    this.generator.cleanup();
+  }
+
+  notify(data) {
+    this.manager.notify(this.type, data);
+  }
+
   playNote(note, delay=0, velocity=100, channel=this.channel) {
     let out = this.output;
     let data = { note, velocity, channel };
-
     let play = () => out.send('noteon', data);
     let stop = () => out.send('noteoff', data);
     if (!delay) { play(); } else { setTimeout(play, delay); }

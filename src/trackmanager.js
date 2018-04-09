@@ -4,13 +4,22 @@ const Track = require('./track');
  *
  */
 class TrackManager {
-  constructor(BPM) {
+  constructor(runner, BPM) {
     // Note that this binding here + tick computation locks all
     // tracks into the same BPM, so we don't get polyrhythm for
     // free in the current implementation. We'd have to give each
     // track its own wall-clock based tick computer for that.
+    this.runner= runner;
     this.BPM = BPM;
     this.tracks = Track.getInstruments().map(name => new Track(this, name, BPM));
+  }
+
+  cleanup() {
+    this.tracks.forEach(track => track.cleanup());
+  }
+
+  notify(trackType, data) {
+    this.runner.send('play-event', {trackType, data} );
   }
 
   updateRoot(root) {
@@ -53,6 +62,7 @@ class TrackManager {
 
   stop() {
     this.pause();
+    this.cleanup();
   }
 };
 
