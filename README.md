@@ -35,7 +35,3 @@ Generators contain `program` arrays which contain note/rest instructions with sp
 	- Piano: [Model 7 Grand](http://www.chocolateaudio.com/products/model-7) (Chocolate Audio)
 	- Drums: [Strike2](https://www.pluginboutique.com/product/1-Instruments/64-Virtual-Instrument/1547-Strike-2) (AIR)
 	- Bass: The double bass from [Cuba](https://www.native-instruments.com/en/products/komplete/world/cuba/) (Native Instruments)
-
-### "Holy shit, those instruments are expensive!"
-
-Yup. Which is why you look at https://rekkerd.org/deals-deals-deals every week or so, so that you can pick up $199+ instruments at 80% or 90% off when those offers present themselves.
